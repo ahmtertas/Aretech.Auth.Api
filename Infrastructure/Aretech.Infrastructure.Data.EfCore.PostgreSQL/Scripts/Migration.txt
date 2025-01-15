@@ -1,0 +1,3 @@
+﻿dotnet ef migrations add InitialCreate --project C:\Source\Aretech.Auth.Api\Infrastructures\Aretech.Infrastructures.Data.EfCore.PostgreSQL --startup-project C:\Source\Aretech.Auth.Api\Presentation\Aretech.Auth.Web.Api
+
+dotnet ef migrations script --project C:\Source\Aretech.Auth.Api\Infrastructures\Aretech.Infrastructures.Data.EfCore.PostgreSQL --startup-project C:\Source\Aretech.Auth.Api\Presentation\Aretech.Auth.Web.Api

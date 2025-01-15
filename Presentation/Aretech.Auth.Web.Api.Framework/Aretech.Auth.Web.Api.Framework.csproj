@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.MongoDb" Version="8.1.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="8.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="8.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="8.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
+    <PackageReference Include="Serilog.Enrichers.WithCaller" Version="1.3.0" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="9.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Building\Caching\Aretech.Caching.Redis\Aretech.Caching.Redis.csproj" />
+    <ProjectReference Include="..\..\Building\MessageBroker\Aretech.MQ.Publisher\Aretech.MQ.Publisher.csproj" />
+    <ProjectReference Include="..\..\Building\MessageBroker\Aretech.MQ.RabbitMQ\Aretech.MQ.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Aretech.Infrastructure.Data.EfCore.PostgreSQL\Aretech.Infrastructure.Data.EfCore.PostgreSQL.csproj" />
+    <ProjectReference Include="..\..\Libraries\Aretech.Application\Aretech.Application.csproj" />
+    <ProjectReference Include="..\..\Libraries\Aretech.Core\Aretech.Core.csproj" />
+    <ProjectReference Include="..\..\Libraries\Aretech.Services\Aretech.Services.csproj" />
+  </ItemGroup>
+
+</Project>
