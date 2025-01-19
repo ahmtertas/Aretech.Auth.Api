@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Configurations.Accounts
 {
-	public class AccountConfiguration : AretechGuidSoftDeleteEntityTypeConfiguration<Account>
+	public class AccountConfiguration : AretechGuidEntityConfiguration<Account>
 	{
 		public override void Configure(EntityTypeBuilder<Account> builder)
 		{

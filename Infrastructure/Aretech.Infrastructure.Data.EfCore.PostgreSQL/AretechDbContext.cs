@@ -27,6 +27,30 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL
 			modelBuilder.HasDbFunction(() => ToTurkishLower(default)).HasName("ToTurkishLower");
 			modelBuilder.HasDbFunction(() => ToTurkishUpper(default)).HasName("ToTurkishUpper");
 
+			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			{
+				foreach (var property in entityType.GetProperties())
+				{
+					if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+					{
+						property.SetColumnType("timestamp without time zone");
+					}
+				}
+			}
+
+			modelBuilder.Entity<Account>().HasData(
+						   new Account
+						   {
+							   IdentityNumber = string.Empty,
+							   IsActived = true,
+							   IsVerified = false,
+							   FirstName = "Süper",
+							   LastName = "Admin",
+							   Username = "superadmin",
+							   Email = "ar3t3ch@gmail.com",
+							   PhoneNumber = "5452158345"
+						   });
+
 			ApplyConfiguration(modelBuilder);
 			base.OnModelCreating(modelBuilder);
 		}
