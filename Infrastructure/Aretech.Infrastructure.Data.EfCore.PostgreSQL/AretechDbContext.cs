@@ -35,6 +35,17 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL
 			modelBuilder.HasDbFunction(() => ToTurkishLower(default)).HasName("ToTurkishLower");
 			modelBuilder.HasDbFunction(() => ToTurkishUpper(default)).HasName("ToTurkishUpper");
 
+			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			{
+				foreach (var property in entityType.GetProperties())
+				{
+					if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+					{
+						property.SetColumnType("timestamp without time zone");
+					}
+				}
+			}
+
 			var hashedPassword = _hashService.HashPassword("~t}k+6Bp0MtH!v!");
 
 			modelBuilder.Entity<Account>().HasData(

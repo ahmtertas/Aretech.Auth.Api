@@ -13,10 +13,6 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Configurations.Accounts
 			builder.HasKey(x => x.Id).HasName("AccountLoginHistory_pkey");
 			builder.ToTable("AccountLoginHistory");
 
-			builder.Property(x => x.CreatedDate).HasColumnType("timestamp without time zone");
-			builder.Property(x => x.UpdatedDate).HasColumnType("timestamp without time zone");
-			builder.Property(x => x.DeletedDate).HasColumnType("timestamp without time zone");
-
 			base.Configure(builder);
 		}
 	}

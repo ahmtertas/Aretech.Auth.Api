@@ -13,10 +13,6 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Configurations.Accounts
 			builder.HasKey(x => x.Id).HasName("RefreshToken_pkey");
 			builder.ToTable("RefreshToken");
 
-			builder.Property(x => x.CreatedDate).HasColumnType("timestamp without time zone");
-			builder.Property(x => x.UpdatedDate).HasColumnType("timestamp without time zone");
-			builder.Property(x => x.DeletedDate).HasColumnType("timestamp without time zone");
-
 			base.Configure(builder);
 		}
 	}
