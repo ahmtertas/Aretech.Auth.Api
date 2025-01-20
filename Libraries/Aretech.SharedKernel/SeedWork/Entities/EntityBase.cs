@@ -2,13 +2,13 @@
 {
 	public abstract class EntityBase<TId> : EntityBase, IEntityBase<TId>, ISoftDelete
 	{
-		public virtual TId Id { get; protected set; }
-		public virtual DateTime CreatedDate { get; protected set; }
-		public virtual Guid CreatedBy { get; protected set; }
-		public virtual DateTime? UpdatedDate { get; protected set; }
-		public virtual Guid UpdatedBy { get; protected set; }
-		public virtual DateTime? DeletedDate { get; protected set; }
-		public virtual Guid DeletedBy { get; protected set; }
+		public virtual TId Id { get; set; }
+		public virtual DateTime CreatedDate { get; set; }
+		public virtual Guid CreatedBy { get; set; }
+		public virtual DateTime? UpdatedDate { get; set; }
+		public virtual Guid UpdatedBy { get; set; }
+		public virtual DateTime? DeletedDate { get; set; }
+		public virtual Guid DeletedBy { get; set; }
 
 		public bool IsDeleted()
 		{
