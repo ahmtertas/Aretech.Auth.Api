@@ -3,5 +3,5 @@ using MediatR;
 
 namespace Aretech.Application.Accounts.Queries.GetAccounts
 {
-	public class GetAccountsQuery : IRequest<BaseEndPointResponse<List<GetAccountsResponse>>> { }
+	public class GetAccountsQuery : IRequest<ApiResponse<List<GetAccountsResponse>>> { }
 }
