@@ -1,4 +1,5 @@
 ﻿using Aretech.Application.Accounts.Commands.CreateAccount;
+using Aretech.Application.Accounts.Commands.Login;
 using Aretech.Application.Accounts.Queries.GetAccounts;
 using Aretech.Application.SeedWork;
 using Aretech.Auth.Web.Api.Framework.Controllers;
@@ -9,7 +10,7 @@ namespace Aretech.Auth.Web.Api.Controllers.Accounts
 {
 	[Authorize]
 	[ApiController]
-	[Route("accounts")]
+	[Route("api/account")]
 	public class AccountsController : BaseController
 	{
 		[ProducesResponseType(statusCode: StatusCodes.Status200OK)]
@@ -30,6 +31,17 @@ namespace Aretech.Auth.Web.Api.Controllers.Accounts
 		public async Task<ApiResponse<CreateAccountResponse>> CreateAccount([FromBody] CreateAccountCommand request, CancellationToken cancellationToken = default)
 		{
 			var response = await Mediator.Send(request, cancellationToken);
+			return response;
+		}
+
+		[AllowAnonymous]
+		[ProducesResponseType(statusCode: StatusCodes.Status200OK)]
+		[ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
+		[ProducesResponseType(statusCode: StatusCodes.Status500InternalServerError, type: typeof(ProblemDetails))]
+		[HttpPost("login")]
+		public async Task<ApiResponse<LoginResponse>> Login([FromBody] LoginCommand request, CancellationToken cancellation = default)
+		{
+			var response = await Mediator.Send(request);
 			return response;
 		}
 	}

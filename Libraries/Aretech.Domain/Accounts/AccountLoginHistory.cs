@@ -7,8 +7,8 @@ namespace Aretech.Domain.Accounts
 	{
 		public Guid AccountId { get; set; }
 
-		public string ClientName { get; set; } = null!;
-		public string ClientVersion { get; set; } = null!;
+		public string? ClientName { get; set; } = null!;
+		public string? ClientVersion { get; set; } = null!;
 		public string AccessToken { get; set; } = null!;
 		public string RefreshToken { get; set; } = null!;
 		public string? Ipv4Address { get; set; }

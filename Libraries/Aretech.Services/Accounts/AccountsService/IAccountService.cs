@@ -7,7 +7,7 @@ namespace Aretech.Services.Accounts.AccountsService
 	{
 		Task<List<Account>> GetAccountsAsync(CancellationToken cancellationToken = default);
 		Task<int> AddAsync(Account account, CancellationToken cancellationToken = default);
-		Task<bool> LoginAsync(LoginModel loginModel, CancellationToken cancellationToken = default);
+		Task<string> LoginAsync(LoginModel loginModel, CancellationToken cancellationToken = default);
 		Task<bool> UpdateAsync(Account account, CancellationToken cancellationToken = default);
 		Task<bool> UpdateAsync(Guid id, CancellationToken cancellationToken = default);
 		Task<bool> DeleteAsync(Account account, CancellationToken cancellationToken = default);

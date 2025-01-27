@@ -1,4 +1,5 @@
-﻿using Aretech.Application.Mapping;
+﻿using Aretech.Application.Common;
+using Aretech.Application.Mapping;
 using Aretech.Application.SeedWork;
 using Aretech.Domain.Accounts;
 using Aretech.Services.Accounts.AccountsService;
@@ -29,8 +30,8 @@ namespace Aretech.Application.Accounts.Commands.CreateAccount
 			return new ApiResponse<CreateAccountResponse>()
 			{
 				Success = true,
-				Message = "",
-				Data = new CreateAccountResponse()
+				Data = new CreateAccountResponse(),
+				Message = MessageConstant.Success
 			};
 		}
 	}

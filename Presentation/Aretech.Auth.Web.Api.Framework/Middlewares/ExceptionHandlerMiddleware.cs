@@ -34,8 +34,8 @@ namespace Aretech.Auth.Web.Api.Framework.Middlewares
 					RootUrl = $"{context.Request.Scheme}://{context.Request.Host}",
 				};
 
-				response.StatusCode = (int)HttpStatusCode.BadRequest;
-				detail.StatusCode = (int)HttpStatusCode.BadRequest;
+				response.StatusCode = arex.StatusCode ?? (int)HttpStatusCode.BadRequest;
+				detail.StatusCode = arex.StatusCode ?? (int)HttpStatusCode.BadRequest;
 				var result = JsonSerializer.Serialize(detail);
 				await response.WriteAsync(result);
 			}

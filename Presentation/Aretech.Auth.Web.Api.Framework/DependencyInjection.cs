@@ -81,19 +81,39 @@ namespace Aretech.Auth.Web.Api.Framework
 				});
 			});
 
-			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-				.AddJwtBearer(options =>
-				{
-					options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-					{
-						ValidateIssuerSigningKey = true,
-						IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("JwtSecret"))),
-						ValidateIssuer = true,
-						ValidateAudience = true,
-						ValidIssuer = builder.Configuration.GetValue<string>("JwtIssuer"),
-						ValidAudience = builder.Configuration.GetValue<string>("JwtAudience")
-					};
-				});
+			builder.Services.AddAuthentication(options =>
+			{
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			})
+		   .AddJwtBearer(options =>
+		   {
+			   options.TokenValidationParameters = new TokenValidationParameters
+			   {
+				   ValidateIssuer = true,
+				   ValidateAudience = true,
+				   ValidateIssuerSigningKey = true,
+				   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSecret"])),
+				   ValidIssuer = builder.Configuration["JwtIssuer"],
+				   ValidAudience = builder.Configuration["JwtAudience"],
+				   ClockSkew = TimeSpan.Zero, // Süre farkını önlemek için sıfırlanabilir,
+				   ValidateLifetime = true
+			   };
+
+			   options.Events = new JwtBearerEvents
+			   {
+				   OnAuthenticationFailed = context =>
+				   {
+					   Console.WriteLine("Authentication failed: " + context.Exception.Message);
+					   return Task.CompletedTask;
+				   },
+				   OnTokenValidated = context =>
+				   {
+					   Console.WriteLine("Token validated for: " + context.Principal.Identity.Name);
+					   return Task.CompletedTask;
+				   }
+			   };
+		   });
 
 			var serviceProvider = builder.Services.BuildServiceProvider();
 			var configuration = serviceProvider.GetRequiredService<IConfiguration>();

@@ -1,6 +1,6 @@
-﻿namespace Aretech.Services.SeedWorks
+﻿namespace Aretech.Services.SeedWorks.Pagination
 {
-	[System.Serializable]
+	[Serializable]
 	public partial class PageList<T> : List<T>, IPagedList<T>
 	{
 		public PageList(IList<T> source, int? pageIndex, int? pageSize, int? totalCount = null)

@@ -2,8 +2,13 @@
 using Aretech.Domain.Accounts;
 using Aretech.Infrastructure.Data;
 using Aretech.Infrastructure.Data.EfCore.PostgreSQL.Helpers;
+using Aretech.Services.Accounts.AccountLoginFailHistoryService;
+using Aretech.Services.Accounts.AccountLoginHistoryService;
 using Aretech.Services.Accounts.Models;
+using Aretech.Services.SeedWorks.DeviceInfoService;
+using Aretech.Services.SeedWorks.Security;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Aretech.Services.Accounts.AccountsService
 {
@@ -12,17 +17,32 @@ namespace Aretech.Services.Accounts.AccountsService
 		private readonly IRepository<Account> _accountRepository;
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IHashService _hashService;
+		private readonly ITokenService _tokenService;
+		private readonly IAccountLoginHistoryService _accountLoginHistoryService;
+		private readonly IAccountLoginFailHistoryService _accountLoginFailHistoryService;
+		private readonly IConfiguration _configuration;
+		private readonly IDeviceInfoService _deviceInfoService;
 
 		public AccountService
-			(
+		(
 						 IRepository<Account> accountRepository,
 						 IUnitOfWork unitOfWork,
-						 IHashService hashService
-			)
+						 IHashService hashService,
+						 ITokenService tokenService,
+						 IAccountLoginHistoryService accountLoginHistoryService,
+						 IAccountLoginFailHistoryService accountLoginFailHistoryService,
+						 IConfiguration configuration,
+						 IDeviceInfoService deviceInfoService
+		)
 		{
 			_accountRepository = accountRepository;
 			_unitOfWork = unitOfWork;
 			_hashService = hashService;
+			_tokenService = tokenService;
+			_accountLoginHistoryService = accountLoginHistoryService;
+			_accountLoginFailHistoryService = accountLoginFailHistoryService;
+			_configuration = configuration;
+			_deviceInfoService = deviceInfoService;
 		}
 		public async Task<int> AddAsync(Account account, CancellationToken cancellationToken = default)
 		{
@@ -60,21 +80,57 @@ namespace Aretech.Services.Accounts.AccountsService
 			return accounts;
 		}
 
-		public async Task<bool> LoginAsync(LoginModel loginModel, CancellationToken cancellationToken = default)
+		public async Task<string> LoginAsync(LoginModel loginModel, CancellationToken cancellationToken = default)
 		{
 			ArgumentNullException.ThrowIfNull(loginModel);
 
+			string token = String.Empty;
+			var osName = _deviceInfoService.GetOsName();
+			var (ipv4, ipv6) = _deviceInfoService.GetIpAddresses();
+			var macAddress = _deviceInfoService.GetMacAddress();
+
 			if (string.IsNullOrEmpty(loginModel.UserName) || string.IsNullOrEmpty(loginModel.Password))
-				throw new AretechException("Kullanıcı adı ve/veya şifre eksik.");
+				throw new AretechException("Kullanıcı adı ve/veya şifre eksik.", System.Net.HttpStatusCode.Unauthorized);
 
 			var user = await _accountRepository.TableNoTracking.Where(x => x.Username == loginModel.UserName).FirstOrDefaultAsync();
 			if (user is null)
-				throw new AretechException("Kullanıcı bulunamadı.");
+				throw new AretechException("Kullanıcı bulunamadı.", System.Net.HttpStatusCode.Unauthorized);
 
 			if (!_hashService.VerifyPassword(loginModel.Password, user.PasswordHash))
-				throw new AretechException("Kullanıcı adı ve/veya şifre eksik.");
+			{
+				var accountLoginFailHistory = new AccountLoginFailHistory
+				{
+					AccountId = user.Id,
+					OsName = osName,
+					Ipv6Address = ipv6,
+					Ipv4Address = ipv4,
+					MacAddress = macAddress,
 
-			return true;
+				};
+				accountLoginFailHistory.SetCreatedBy(user.Id);
+				await _accountLoginFailHistoryService.AddAsync(accountLoginFailHistory);
+
+				throw new AretechException("Kullanıcı adı ve/veya şifre eksik.", System.Net.HttpStatusCode.Unauthorized);
+			}
+			else
+			{
+				token = _tokenService.GenerateToken(user);
+				var accountLoginHistory = new AccountLoginHistory
+				{
+					AccountId = user.Id,
+					AccessToken = token,
+					ExpiredIn = Convert.ToInt32(_configuration["ExpiresInMinutes"]),
+					RefreshToken = token,
+					OsName = osName,
+					Ipv6Address = ipv6,
+					Ipv4Address = ipv4,
+					MacAddress = macAddress,
+				};
+				accountLoginHistory.SetCreatedBy(user.Id);
+				await _accountLoginHistoryService.AddAsync(accountLoginHistory);
+			}
+
+			return token;
 		}
 
 		public async Task<bool> UpdateAsync(Account account, CancellationToken cancellationToken = default)

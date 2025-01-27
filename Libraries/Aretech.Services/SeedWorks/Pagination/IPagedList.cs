@@ -1,4 +1,4 @@
-﻿namespace Aretech.Services.SeedWorks
+﻿namespace Aretech.Services.SeedWorks.Pagination
 {
 	public interface IPagedList<T> : IList<T>
 	{
