@@ -1,5 +1,6 @@
 ﻿using Aretech.Application.Accounts.Commands.CreateAccount;
 using Aretech.Application.Accounts.Commands.Login;
+using Aretech.Application.Accounts.Commands.RefreshToken;
 using Aretech.Application.Accounts.Queries.GetAccounts;
 using Aretech.Application.SeedWork;
 using Aretech.Auth.Web.Api.Framework.Controllers;
@@ -42,6 +43,17 @@ namespace Aretech.Auth.Web.Api.Controllers.Accounts
 		public async Task<ApiResponse<LoginResponse>> Login([FromBody] LoginCommand request, CancellationToken cancellation = default)
 		{
 			var response = await Mediator.Send(request);
+			return response;
+		}
+
+		[AllowAnonymous]
+		[ProducesResponseType(statusCode: StatusCodes.Status200OK)]
+		[ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
+		[ProducesResponseType(statusCode: StatusCodes.Status500InternalServerError, type: typeof(ProblemDetails))]
+		[HttpPost("refresh-token")]
+		public async Task<ApiResponse<LoginResponse>> Refresh([FromBody] RefreshTokenCommand command)
+		{
+			var response = await Mediator.Send(command);
 			return response;
 		}
 	}

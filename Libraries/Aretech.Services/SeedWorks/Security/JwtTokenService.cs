@@ -17,9 +17,9 @@ namespace Aretech.Services.SeedWorks.Security
 
 		public string GenerateToken(Account account)
 		{
-			var key = Encoding.UTF8.GetBytes(_configuration["JwtSecret"]);
-			var issuer = _configuration["JwtIssuer"];
-			var audience = _configuration["JwtAudience"];
+			var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+			var issuer = _configuration["Jwt:Issuer"];
+			var audience = _configuration["Jwt:Audience"];
 
 			var claims = new List<Claim>
 		{
@@ -30,7 +30,7 @@ namespace Aretech.Services.SeedWorks.Security
 			var tokenDescriptor = new SecurityTokenDescriptor
 			{
 				Subject = new ClaimsIdentity(claims),
-				Expires = DateTime.UtcNow.AddHours(Convert.ToInt32(_configuration["ExpiresInMinutes"])),
+				Expires = DateTime.UtcNow.AddHours(Convert.ToInt32(_configuration["Jwt:ExpiresInMinutes"])),
 				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
 				Issuer = issuer,
 				Audience = audience
@@ -43,7 +43,7 @@ namespace Aretech.Services.SeedWorks.Security
 
 		public bool ValidateToken(string token)
 		{
-			var key = Encoding.UTF8.GetBytes(_configuration["JwtSecret"]);
+			var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 			var tokenHandler = new JwtSecurityTokenHandler();
 
 			try
@@ -54,14 +54,14 @@ namespace Aretech.Services.SeedWorks.Security
 					IssuerSigningKey = new SymmetricSecurityKey(key),
 					ValidateIssuer = true,
 					ValidateAudience = true,
-					ValidIssuer = _configuration["JwtIssuer"],
-					ValidAudience = _configuration["JwtAudience"],
+					ValidIssuer = _configuration["Jwt:Issuer"],
+					ValidAudience = _configuration["Jwt:Audience"],
 					ClockSkew = TimeSpan.Zero,
 					LifetimeValidator = (notBefore, expires, securityToken, validationParameters) =>
 					{
 						if (expires.HasValue)
 						{
-							return DateTime.Now < expires.Value.AddMinutes(Convert.ToInt32(_configuration["ExpiresInMinutes"]));
+							return DateTime.Now < expires.Value.AddMinutes(Convert.ToInt32(_configuration["Jwt:ExpiresInMinutes"]));
 						}
 						return false;
 					}
@@ -73,6 +73,33 @@ namespace Aretech.Services.SeedWorks.Security
 			{
 				return false;
 			}
+		}
+
+		public string GenerateRefreshToken()
+		{
+			return Guid.NewGuid().ToString();
+		}
+
+		public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+		{
+			var tokenValidationParameters = new TokenValidationParameters
+			{
+				ValidateAudience = false,
+				ValidateIssuer = false,
+				ValidateIssuerSigningKey = true,
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
+				ValidateLifetime = false // Süre dolmuş token'ları da kabul et
+			};
+
+			var tokenHandler = new JwtSecurityTokenHandler();
+			var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+
+			if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+			{
+				throw new SecurityTokenException("Geçersiz token.");
+			}
+
+			return principal;
 		}
 	}
 }

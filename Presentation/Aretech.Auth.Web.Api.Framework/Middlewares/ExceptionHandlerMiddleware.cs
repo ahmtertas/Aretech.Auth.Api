@@ -1,4 +1,5 @@
 ﻿using Aretech.Core;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using System.Net;
@@ -36,6 +37,26 @@ namespace Aretech.Auth.Web.Api.Framework.Middlewares
 
 				response.StatusCode = arex.StatusCode ?? (int)HttpStatusCode.BadRequest;
 				detail.StatusCode = arex.StatusCode ?? (int)HttpStatusCode.BadRequest;
+				var result = JsonSerializer.Serialize(detail);
+				await response.WriteAsync(result);
+			}
+
+			catch (ValidationException ex)
+			{
+				var response = context.Response;
+				response.ContentType = "application/json";
+				var detail = new ErrorDetail
+				{
+					Message = ex.Message,
+					Detail = GetFullException(ex),
+					Instance = context.Request.Path,
+					Type = context.Request.GetDisplayUrl(),
+					RootUrl = $"{context.Request.Scheme}://{context.Request.Host}",
+					Errors = ex.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}").ToList()
+				};
+
+				response.StatusCode = (int)HttpStatusCode.BadRequest;
+				detail.StatusCode = (int)HttpStatusCode.BadRequest;
 				var result = JsonSerializer.Serialize(detail);
 				await response.WriteAsync(result);
 			}
@@ -94,6 +115,7 @@ namespace Aretech.Auth.Web.Api.Framework.Middlewares
 			public string Type { get; set; } = null!;
 			public string Message { get; set; } = null!;
 			public string Detail { get; set; } = null!;
+			public IEnumerable<string> Errors { get; set; } = new List<string>();
 		}
 	}
 }

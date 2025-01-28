@@ -10,7 +10,9 @@ namespace Aretech.Application.Mapping
 	{
 		public ApplicationMappingProfile()
 		{
-			CreateMap<CreateAccountCommand, Account>();
+			CreateMap<CreateAccountCommand, Account>()
+				.ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password));
+
 			CreateMap<LoginCommand, LoginModel>();
 		}
 	}

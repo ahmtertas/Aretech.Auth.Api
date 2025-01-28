@@ -1,4 +1,5 @@
 ﻿using Aretech.Domain.Accounts;
+using System.Security.Claims;
 
 namespace Aretech.Services.SeedWorks.Security
 {
@@ -6,5 +7,7 @@ namespace Aretech.Services.SeedWorks.Security
 	{
 		string GenerateToken(Account account);
 		bool ValidateToken(string token);
+		string GenerateRefreshToken();
+		ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
 	}
 }

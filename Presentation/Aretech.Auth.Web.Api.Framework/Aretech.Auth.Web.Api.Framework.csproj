@@ -12,7 +12,7 @@
     <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="8.0.2" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="8.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.RateLimiting" Version="7.0.0-rc.2.22476.2" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
@@ -28,6 +28,7 @@
     <ProjectReference Include="..\..\Building\MessageBroker\Aretech.MQ.Publisher\Aretech.MQ.Publisher.csproj" />
     <ProjectReference Include="..\..\Building\MessageBroker\Aretech.MQ.RabbitMQ\Aretech.MQ.RabbitMQ.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Aretech.Infrastructure.Data.EfCore.PostgreSQL\Aretech.Infrastructure.Data.EfCore.PostgreSQL.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Aretech.Infrastructure\Aretech.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Libraries\Aretech.Application\Aretech.Application.csproj" />
     <ProjectReference Include="..\..\Libraries\Aretech.Core\Aretech.Core.csproj" />
     <ProjectReference Include="..\..\Libraries\Aretech.Services\Aretech.Services.csproj" />

@@ -74,6 +74,14 @@ namespace Aretech.Services.Accounts.AccountsService
 			return await DeleteAsync(account);
 		}
 
+		public async Task<Account?> GetAccountByUserNameAsync(string userName, CancellationToken cancellation = default)
+		{
+			ArgumentNullException.ThrowIfNull(userName);
+
+			var account = await _accountRepository.Table.FirstOrDefaultAsync(x => x.Username.Equals(userName));
+			return account;
+		}
+
 		public async Task<List<Account>> GetAccountsAsync(CancellationToken cancellationToken = default)
 		{
 			var accounts = await _accountRepository.TableNoTracking.ToListAsync();

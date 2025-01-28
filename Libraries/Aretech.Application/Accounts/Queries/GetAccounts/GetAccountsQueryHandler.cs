@@ -1,4 +1,5 @@
-﻿using Aretech.Application.SeedWork;
+﻿using Aretech.Application.Common;
+using Aretech.Application.SeedWork;
 using Aretech.Services.Accounts.AccountsService;
 using MediatR;
 
@@ -14,7 +15,12 @@ namespace Aretech.Application.Accounts.Queries.GetAccounts
 		public async Task<ApiResponse<List<GetAccountsResponse>>> Handle(GetAccountsQuery request, CancellationToken cancellationToken)
 		{
 			var response = await _accountService.GetAccountsAsync();
-			throw new NotImplementedException();
+			return new ApiResponse<List<GetAccountsResponse>>()
+			{
+				Data = [],
+				Success = true,
+				Message = MessageConstant.Success
+			};
 		}
 	}
 }

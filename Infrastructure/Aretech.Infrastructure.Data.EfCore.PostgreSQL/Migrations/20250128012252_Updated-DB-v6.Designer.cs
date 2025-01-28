@@ -3,6 +3,7 @@ using System;
 using Aretech.Infrastructure.Data.EfCore.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(AretechDbContext))]
-    partial class AretechDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250128012252_Updated-DB-v6")]
+    partial class UpdatedDBv6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

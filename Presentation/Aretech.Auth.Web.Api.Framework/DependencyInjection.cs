@@ -1,8 +1,10 @@
 ﻿using Aretech.Application;
 using Aretech.Auth.Web.Api.Framework.Middlewares;
+using Aretech.Auth.Web.Api.Framework.Models;
 using Aretech.Auth.Web.Api.Framework.Serilog;
 using Aretech.Caching.Redis;
 using Aretech.Core;
+using Aretech.Infrastructure;
 using Aretech.Infrastructure.Data.EfCore.PostgreSQL;
 using Aretech.MQ.Publisher;
 using Aretech.MQ.RabbitMQ;
@@ -65,6 +67,7 @@ namespace Aretech.Auth.Web.Api.Framework
 			builder.Services.AddRedis();
 			builder.Services.AddRabbitMQ();
 			builder.Services.AddEfCorePostgreSQL();
+			builder.Services.AddInfrastructure();
 			builder.Services.AddApplication();
 			builder.Services.AddServices();
 			builder.Services.AddMQPublisher();
@@ -93,9 +96,9 @@ namespace Aretech.Auth.Web.Api.Framework
 				   ValidateIssuer = true,
 				   ValidateAudience = true,
 				   ValidateIssuerSigningKey = true,
-				   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSecret"])),
-				   ValidIssuer = builder.Configuration["JwtIssuer"],
-				   ValidAudience = builder.Configuration["JwtAudience"],
+				   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+				   ValidIssuer = builder.Configuration["Jwt:Issuer"],
+				   ValidAudience = builder.Configuration["Jwt:Audience"],
 				   ClockSkew = TimeSpan.Zero, // Süre farkını önlemek için sıfırlanabilir,
 				   ValidateLifetime = true
 			   };
@@ -188,6 +191,9 @@ namespace Aretech.Auth.Web.Api.Framework
 			app.UseAuthentication();
 			app.UseAuthorization();
 
+
+			var rateLimitingRules = builder.Configuration.GetSection("IpRateLimiting:GeneralRules").Get<List<RateLimitingRule>>();
+			app.UseMiddleware<RateLimitingMiddleware>(rateLimitingRules);
 			app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 			app.MapControllers();
