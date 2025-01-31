@@ -2,7 +2,6 @@
 using Aretech.Auth.Web.Api.Framework.Middlewares;
 using Aretech.Auth.Web.Api.Framework.Models;
 using Aretech.Auth.Web.Api.Framework.Serilog;
-using Aretech.Caching.Redis;
 using Aretech.Core;
 using Aretech.Infrastructure;
 using Aretech.Infrastructure.Data.EfCore.PostgreSQL;
@@ -16,10 +15,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NpgsqlTypes;
 using Prometheus;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Enrichers.WithCaller;
+using Serilog.Events;
+using Serilog.Sinks.PostgreSQL;
 using System.Text;
 
 
@@ -64,7 +66,7 @@ namespace Aretech.Auth.Web.Api.Framework
 				});
 			});
 
-			builder.Services.AddRedis();
+			//builder.Services.AddRedis();
 			builder.Services.AddRabbitMQ();
 			builder.Services.AddEfCorePostgreSQL();
 			builder.Services.AddInfrastructure();
@@ -132,17 +134,16 @@ namespace Aretech.Auth.Web.Api.Framework
 
 			builder.Services.AddHealthChecks()
 				.AddNpgSql(
-				connectionString: configuration["PgSqlDbConnectionString"],
+				connectionString: configuration["ConnectionStrings:PgSqlDbConnectionString"],
 				name: "",
 				failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
 				tags: new[] { "db", "sql", "postgresql" })
-				//.AddMongoDb(
-				//mongodbConnectionString: configuration[""],
-				//name: "mongodb-rabbitmqlog",
-				//failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
-				//tags: new[] { "db", "nosql", "mongodb" }
-
-				//)
+				.AddMongoDb(
+				mongodbConnectionString: configuration[""],
+				name: "mongodb-rabbitmqlog",
+				failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
+				tags: new[] { "db", "nosql", "mongodb" }
+				)
 				.AddRabbitMQ(
 				rabbitConnectionString: rabbitMQOperationConnectionString,
 				name: "rabbitmq-operation",
@@ -156,10 +157,31 @@ namespace Aretech.Auth.Web.Api.Framework
 			//timeout: TimeSpan.FromSeconds(5),
 			//tags: new string[] { "ready", "alive" });
 
+			var connectionString = configuration.GetValue<string>("ConnectionStrings:PgSqlDbConnectionString");
+			var columnWriters = new Dictionary<string, ColumnWriterBase>
+{
+					{ "timestamp", new TimestampColumnWriter() },
+					{ "level", new LevelColumnWriter(true, NpgsqlDbType.Text) },
+					{ "message", new RenderedMessageColumnWriter() },
+					{ "exception", new ExceptionColumnWriter() },
+					{ "properties", new LogEventSerializedColumnWriter() }
+				};
+
+			var mongoConnectionString = configuration.GetValue<string>("ConnectionStrings:MongoDbConnectionString");
 
 			Log.Logger = new LoggerConfiguration()
 						 .MinimumLevel.Information()
 						 .WriteTo.Console()
+						 .WriteTo.File($"Logs/{DateTime.Now.Date.ToString("yyyy-MM-dd")}/info-.txt", rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: LogEventLevel.Information)
+						 .WriteTo.File($"Logs/{DateTime.Now.Date.ToString("yyyy-MM-dd")}/error-.txt", rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: LogEventLevel.Error)
+						 .WriteTo.File($"Logs/{DateTime.Now.Date.ToString("yyyy-MM-dd")}/fatal-.txt", rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: LogEventLevel.Fatal)
+						 .WriteTo.PostgreSQL(
+										connectionString: connectionString,
+										tableName: "Logs",
+										columnOptions: columnWriters,
+										needAutoCreateTable: false)
+						 .WriteTo.MongoDB(mongoConnectionString, "aretech-auth-db", LogEventLevel.Information)
+						 .WriteTo.MongoDB(mongoConnectionString, "aretech-auth-db", LogEventLevel.Error)
 						 .Enrich.FromLogContext()
 						 .Enrich.WithMachineName()
 						 .Enrich.WithThreadId()
@@ -198,7 +220,7 @@ namespace Aretech.Auth.Web.Api.Framework
 
 			app.MapControllers();
 
-			app.MapHealthChecks("/health");
+			//app.MapHealthChecks("/health");
 
 			app.UseMetricServer("/metrics");
 

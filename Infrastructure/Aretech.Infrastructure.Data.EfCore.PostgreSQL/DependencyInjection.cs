@@ -12,7 +12,7 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL
 			var serviceProvider = services.BuildServiceProvider();
 			var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
-			services.AddDbContext<AretechDbContext>(options => options.UseNpgsql(configuration["PgSqlDbConnectionString"]));
+			services.AddDbContext<AretechDbContext>(options => options.UseNpgsql(configuration["ConnectionStrings:PgSqlDbConnectionString"]));
 			services.AddScoped(typeof(IRepository<>), typeof(AretechEFRepository<>));
 			services.AddScoped<IUnitOfWork, UnitOfWork>();
 			services.AddScoped<IHashService, HashService>();
