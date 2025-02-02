@@ -17,7 +17,7 @@ namespace Aretech.Services.Accounts.PasswordResetService
 			_repository = repository;
 			_unitOfWork = unitOfWork;
 		}
-		public async Task<string> AddPasswordResetAsync()
+		public async Task<string> AddPasswordResetAsync(Guid accountId)
 		{
 			var token = Guid.NewGuid().ToString();
 			var expiry = DateTime.Now.AddMinutes(2); // 2 dakika geçerli
@@ -25,7 +25,8 @@ namespace Aretech.Services.Accounts.PasswordResetService
 			var passwordReset = new PasswordReset
 			{
 				Token = token,
-				Expiration = expiry
+				Expiration = expiry,
+				AccountId = accountId
 			};
 			passwordReset.SetCreatedBy(Guid.NewGuid());
 			await _repository.AddAsync(passwordReset);
@@ -34,10 +35,10 @@ namespace Aretech.Services.Accounts.PasswordResetService
 			return token;
 		}
 
-		public async Task<bool> ValidatePasswordResetToken(string token, DateTime expiry)
+		public async Task<PasswordReset?> ValidatePasswordResetToken(string token)
 		{
 			return await _repository.TableNoTracking
-									.AnyAsync(x => x.Token.Equals(token)
+									.FirstOrDefaultAsync(x => x.Token.Equals(token)
 												&& x.Expiration >= DateTime.Now);
 		}
 	}

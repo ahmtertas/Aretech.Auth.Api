@@ -29,7 +29,7 @@ namespace Aretech.Application.Accounts.Commands.ForgotPassword
 			if (account is null)
 				throw new AretechException("Kullanıcı bulunamadı.", System.Net.HttpStatusCode.BadRequest);
 
-			var token = _passwordResetService.AddPasswordResetAsync();
+			var token = _passwordResetService.AddPasswordResetAsync(account.Id);
 
 			var resetLink = $"http://localhost/reset-password?token={token}";
 			var emailBody = $"Please reset your password by clicking here: <a href='{resetLink}'>Reset Password</a>";

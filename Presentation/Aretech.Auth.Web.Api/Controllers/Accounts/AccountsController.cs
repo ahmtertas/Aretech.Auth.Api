@@ -1,4 +1,5 @@
 ﻿using Aretech.Application.Accounts.Commands.CreateAccount;
+using Aretech.Application.Accounts.Commands.ForgotPassword;
 using Aretech.Application.Accounts.Commands.Login;
 using Aretech.Application.Accounts.Commands.Logout;
 using Aretech.Application.Accounts.Commands.RefreshToken;
@@ -71,6 +72,17 @@ namespace Aretech.Auth.Web.Api.Controllers.Accounts
 		[ProducesResponseType(statusCode: StatusCodes.Status500InternalServerError, type: typeof(ProblemDetails))]
 		[HttpPost("refresh-token")]
 		public async Task<ApiResponse<LoginResponse>> Refresh([FromBody] RefreshTokenCommand command)
+		{
+			var response = await Mediator.Send(command);
+			return response;
+		}
+
+		[AllowAnonymous]
+		[ProducesResponseType(statusCode: StatusCodes.Status200OK)]
+		[ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
+		[ProducesResponseType(statusCode: StatusCodes.Status500InternalServerError, type: typeof(ProblemDetails))]
+		[HttpPost("forgot-password")]
+		public async Task<ApiResponse<bool>> ForgotPassword([FromBody] ForgotPasswordCommand command)
 		{
 			var response = await Mediator.Send(command);
 			return response;

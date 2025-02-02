@@ -1,8 +1,10 @@
-﻿namespace Aretech.Services.Accounts.PasswordResetService
+﻿using Aretech.Domain.Accounts;
+
+namespace Aretech.Services.Accounts.PasswordResetService
 {
 	public interface IPasswordResetService
 	{
-		Task<int> AddPasswordResetAsync();
-		Task<bool> ValidatePasswordResetToken(string token, DateTime expiry);
+		Task<string> AddPasswordResetAsync(Guid accountId);
+		Task<PasswordReset?> ValidatePasswordResetToken(string token);
 	}
 }
