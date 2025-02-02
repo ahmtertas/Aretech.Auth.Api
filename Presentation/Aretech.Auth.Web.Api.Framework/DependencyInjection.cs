@@ -2,6 +2,7 @@
 using Aretech.Auth.Web.Api.Framework.Middlewares;
 using Aretech.Auth.Web.Api.Framework.Models;
 using Aretech.Auth.Web.Api.Framework.Serilog;
+using Aretech.Caching.Redis;
 using Aretech.Core;
 using Aretech.Infrastructure;
 using Aretech.Infrastructure.Data.EfCore.PostgreSQL;
@@ -22,6 +23,7 @@ using Serilog.Debugging;
 using Serilog.Enrichers.WithCaller;
 using Serilog.Events;
 using Serilog.Sinks.PostgreSQL;
+using StackExchange.Redis;
 using System.Text;
 
 
@@ -66,7 +68,7 @@ namespace Aretech.Auth.Web.Api.Framework
 				});
 			});
 
-			//builder.Services.AddRedis();
+			builder.Services.AddRedis();
 			builder.Services.AddRabbitMQ();
 			builder.Services.AddEfCorePostgreSQL();
 			builder.Services.AddInfrastructure();
@@ -74,6 +76,27 @@ namespace Aretech.Auth.Web.Api.Framework
 			builder.Services.AddServices();
 			builder.Services.AddMQPublisher();
 			builder.Services.AddScoped<IAuthenticationContext, AuthenticationContext>();
+
+			builder.Services.AddStackExchangeRedisCache(options =>
+			{
+				options.ConfigurationOptions = new ConfigurationOptions
+				{
+					EndPoints = { "localhost:6379" },
+					//Password = "yourpassword",
+					AbortOnConnectFail = false,
+					ConnectTimeout = 5000,
+					SyncTimeout = 5000,
+					DefaultDatabase = 0,
+					Ssl = true,
+					SslProtocols = System.Security.Authentication.SslProtocols.Tls12,
+					ConnectRetry = 3,
+					ReconnectRetryPolicy = new ExponentialRetry(5000),
+					KeepAlive = 180,
+					ClientName = "Aretech-Auth-Api"
+				};
+				options.InstanceName = "SampleInstance";
+			});
+
 
 			var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
 			builder.Services.AddCors(options =>
@@ -217,6 +240,7 @@ namespace Aretech.Auth.Web.Api.Framework
 			var rateLimitingRules = builder.Configuration.GetSection("IpRateLimiting:GeneralRules").Get<List<RateLimitingRule>>();
 			app.UseMiddleware<RateLimitingMiddleware>(rateLimitingRules);
 			app.UseMiddleware<ExceptionHandlerMiddleware>();
+			app.UseMiddleware<TokenBlacklistMiddleware>();
 
 			app.MapControllers();
 

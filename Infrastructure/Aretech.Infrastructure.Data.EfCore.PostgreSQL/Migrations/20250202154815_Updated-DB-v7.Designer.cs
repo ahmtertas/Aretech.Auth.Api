@@ -3,6 +3,7 @@ using System;
 using Aretech.Infrastructure.Data.EfCore.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(AretechDbContext))]
-    partial class AretechDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250202154815_Updated-DB-v7")]
+    partial class UpdatedDBv7
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,7 +105,7 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("15702382-0bbf-4474-a422-4616da24d240"),
+                            Id = new Guid("741e5fe8-a6d7-4f3d-ad52-3a4daeb2b567"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedBy = new Guid("00000000-0000-0000-0000-000000000000"),
@@ -113,7 +116,7 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
                             IsActived = true,
                             IsVerified = false,
                             LastName = "Admin",
-                            PasswordHash = "TQ/z5tTLQABTnZfmzOT1Zi5tyStSAVVaAEz/q7QBmWH1/1ue0tzrXlzhV93VrNzQ",
+                            PasswordHash = "qDvusClNeMP1NicA8W7O5H4GniDZ2IXseR0DVu0tdBqR71k8Ww8WvD4k3x+Ah1m2",
                             PhoneNumber = "5452158345",
                             TwoFactorEnabled = false,
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
@@ -325,10 +328,13 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
                     b.ToTable("PasswordHistory", (string)null);
                 });
 
-            modelBuilder.Entity("Aretech.Domain.Accounts.PasswordReset", b =>
+            modelBuilder.Entity("Aretech.Domain.Accounts.PasswordResetRequest", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("CreatedBy")
@@ -346,6 +352,9 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
                     b.Property<DateTime>("Expiration")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("text");
@@ -358,6 +367,8 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
 
                     b.HasKey("Id")
                         .HasName("PasswordResetRequest_pkey");
+
+                    b.HasIndex("AccountId");
 
                     b.ToTable("PasswordResetRequest", (string)null);
                 });
@@ -515,6 +526,17 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
                 });
 
             modelBuilder.Entity("Aretech.Domain.Accounts.PasswordHistory", b =>
+                {
+                    b.HasOne("Aretech.Domain.Accounts.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("Aretech.Domain.Accounts.PasswordResetRequest", b =>
                 {
                     b.HasOne("Aretech.Domain.Accounts.Account", "Account")
                         .WithMany()

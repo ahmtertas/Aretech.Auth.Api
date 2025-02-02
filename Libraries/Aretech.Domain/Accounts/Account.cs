@@ -26,5 +26,6 @@ namespace Aretech.Domain.Accounts
 
 		public Collection<AccountLoginFailHistory> AccountLoginFailHistorys { get; set; } = new Collection<AccountLoginFailHistory>();
 		public Collection<AccountLoginHistory> AccountLoginHistorys { get; set; } = new Collection<AccountLoginHistory>();
+		public Collection<BlacklistedToken> BlacklistedTokens { get; set; } = new Collection<BlacklistedToken>();
 	}
 }

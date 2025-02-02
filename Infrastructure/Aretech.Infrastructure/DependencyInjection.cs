@@ -14,7 +14,7 @@ namespace Aretech.Infrastructure
 
 			var sendGridApiKey = configuration["SendGrid:ApiKey"];
 
-			services.AddScoped<IEmailService>(_ => new SendGridEmailService(sendGridApiKey));
+			services.AddScoped<IEmailService, SendGmailEmailService>();
 
 			return services;
 		}

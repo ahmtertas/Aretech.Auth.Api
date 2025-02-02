@@ -36,13 +36,11 @@ namespace Aretech.Application.Accounts.Commands.Login
 			var accessToken = await _accountService.LoginAsync(loginModel);
 			var refreshToken = _tokenService.GenerateRefreshToken();
 
-
 			var account = await _accountService.GetAccountByUserNameAsync(request.UserName);
 			ArgumentNullException.ThrowIfNull(nameof(account), "Account is null.");
 			account.RefreshToken = refreshToken;
 			account.RefreshTokenExpiryTime = DateTime.Now.AddDays(Convert.ToInt32(_config["Jwt:RefreshTokenExpirationDays"]));
 			await _accountService.UpdateAsync(account);
-
 
 			return new ApiResponse<LoginResponse>()
 			{

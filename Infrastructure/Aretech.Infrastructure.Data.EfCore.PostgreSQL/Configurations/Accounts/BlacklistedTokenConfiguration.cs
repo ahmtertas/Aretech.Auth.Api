@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Configurations.Accounts
 {
-	public class PasswordResetRequestConfiguration : AretechGuidEntityConfiguration<PasswordResetRequest>
+	public class BlacklistedTokenConfiguration : AretechGuidEntityConfiguration<BlacklistedToken>
 	{
-		public override void Configure(EntityTypeBuilder<PasswordResetRequest> builder)
+		public override void Configure(EntityTypeBuilder<BlacklistedToken> builder)
 		{
 
-			builder.HasKey(x => x.Id).HasName("PasswordResetRequest_pkey");
-			builder.ToTable("PasswordResetRequest");
+			builder.HasKey(x => x.Id).HasName("BlacklistedToken_pkey");
+			builder.ToTable("BlacklistedToken");
 
 			base.Configure(builder);
 		}

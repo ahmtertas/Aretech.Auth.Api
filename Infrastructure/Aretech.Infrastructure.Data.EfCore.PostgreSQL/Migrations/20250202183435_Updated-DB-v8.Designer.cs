@@ -3,6 +3,7 @@ using System;
 using Aretech.Infrastructure.Data.EfCore.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
 {
     [DbContext(typeof(AretechDbContext))]
-    partial class AretechDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250202183435_Updated-DB-v8")]
+    partial class UpdatedDBv8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,7 +105,7 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("15702382-0bbf-4474-a422-4616da24d240"),
+                            Id = new Guid("1ea5d923-0981-4b8f-8305-52e659ae5e9e"),
                             CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedBy = new Guid("00000000-0000-0000-0000-000000000000"),
@@ -113,7 +116,7 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
                             IsActived = true,
                             IsVerified = false,
                             LastName = "Admin",
-                            PasswordHash = "TQ/z5tTLQABTnZfmzOT1Zi5tyStSAVVaAEz/q7QBmWH1/1ue0tzrXlzhV93VrNzQ",
+                            PasswordHash = "4sKYmvhaOPtHQGFmcBHT6cZGutOT1ubsFYkBhESp5nXp8JskZr21ztYRJE8asyd4",
                             PhoneNumber = "5452158345",
                             TwoFactorEnabled = false,
                             UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
@@ -331,6 +334,9 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
@@ -358,6 +364,8 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
 
                     b.HasKey("Id")
                         .HasName("PasswordResetRequest_pkey");
+
+                    b.HasIndex("AccountId");
 
                     b.ToTable("PasswordResetRequest", (string)null);
                 });
@@ -515,6 +523,17 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL.Migrations
                 });
 
             modelBuilder.Entity("Aretech.Domain.Accounts.PasswordHistory", b =>
+                {
+                    b.HasOne("Aretech.Domain.Accounts.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("Aretech.Domain.Accounts.PasswordReset", b =>
                 {
                     b.HasOne("Aretech.Domain.Accounts.Account", "Account")
                         .WithMany()

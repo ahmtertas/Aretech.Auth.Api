@@ -25,8 +25,9 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL
 		DbSet<Application> Applications { get; set; }
 		DbSet<AccountApplicationMapping> AccountApplicationMappings { get; set; }
 		DbSet<PasswordHistory> PasswordHistories { get; set; }
-		DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
+		DbSet<PasswordReset> PasswordResets { get; set; }
 		DbSet<RefreshToken> RefreshTokens { get; set; }
+		DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
 
 		#endregion
 
@@ -74,8 +75,9 @@ namespace Aretech.Infrastructure.Data.EfCore.PostgreSQL
 			modelBuilder.ApplyConfiguration(new AccountLoginHistoryConfiguration());
 			modelBuilder.ApplyConfiguration(new AccountLoginFailHistoryConfiguration());
 			modelBuilder.ApplyConfiguration(new PasswordHistoryConfiguration());
-			modelBuilder.ApplyConfiguration(new PasswordResetRequestConfiguration());
+			modelBuilder.ApplyConfiguration(new PasswordResetConfiguration());
 			modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
+			modelBuilder.ApplyConfiguration(new BlacklistedTokenConfiguration());
 			#endregion
 
 			#region Application
